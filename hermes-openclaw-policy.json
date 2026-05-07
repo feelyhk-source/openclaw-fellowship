@@ -1,0 +1,133 @@
+{
+  "version": "2026-05-08-local-paperclip-honcho-self-host-ouroboros-optimized",
+  "runtime": {
+    "mode": "local",
+    "vps": false,
+    "primaryAgent": "Hermes",
+    "executionAgent": "OpenClaw",
+    "telegram": "openclaw-native"
+  },
+  "models": {
+    "default": "deepseek-v4-flash:cloud",
+    "hermesEndpoint": "http://127.0.0.1:11434/v1",
+    "routine": [
+      "ollama/qwen3.5:cloud",
+      "ollama/deepseek-v4-flash:cloud",
+      "ollama/kimi-k2.6:cloud",
+      "ollama/glm-5.1:cloud"
+    ],
+    "escalation": [
+      "claude-cli/claude-sonnet-4-6",
+      "openai-codex/gpt-5.5",
+      "gemini-cli/gemini-auth"
+    ],
+    "geminiStatus": "google-antigravity auth profile exists in OpenClaw; Hermes Gemini OAuth not logged in"
+  },
+  "tools": {
+    "memory": {
+      "active": "honcho-local-for-hermes-plus-builtin-hermes-memory-plus-optional-mempalace",
+      "candidates": [
+        "mempalace",
+        "mem0",
+        "honcho"
+      ],
+      "honcho": {
+        "scope": "hermes-only",
+        "providerSelected": true,
+        "status": "local-self-host-active",
+        "baseUrl": "http://127.0.0.1:8000",
+        "source": "/Users/ki_mini/Projects/tool/honcho",
+        "database": "postgresql@17 database honcho with pgvector",
+        "apiService": "com.local.honcho-api",
+        "deriverService": "com.local.honcho-deriver",
+        "embeddingProxyService": "com.local.honcho-embed-proxy",
+        "embeddingEndpoint": "http://127.0.0.1:11435/v1",
+        "embeddingModel": "granite-embedding padded to 1536 dimensions",
+        "llmEndpoint": "http://127.0.0.1:11434/v1",
+        "llmModel": "qwen3.5:cloud",
+        "periodicDreams": false,
+        "policyFile": "/Users/ki_mini/.hermes/honcho.json",
+        "helper": "/Users/ki_mini/.openclaw/workspace/scripts/honcho-hermes-enable.sh",
+        "tokenPolicy": "tools-mode recall, bounded context, shallow dialectic depth, slower recall cadence, no OpenClaw Telegram injection",
+        "optimized": {
+          "getContextMaxTokens": 8000,
+          "maxMessageSize": 8000,
+          "deriverPollingSeconds": 15,
+          "vectorReconciliationSeconds": 3600,
+          "dreamsEnabled": false
+        }
+      },
+      "note": "mem0 is not active; Honcho is active for Hermes only through local self-host and should not be injected directly into OpenClaw Telegram"
+    },
+    "tokenSaving": {
+      "active": "rtk-optimizer",
+      "policy": "small bootstrap context, memory only on demand, summarize before escalation"
+    },
+    "paperclip": {
+      "status": "local-server-active-adapters-loaded",
+      "path": "/Users/ki_mini/Projects/tool/hermes-paperclip-adapter",
+      "policy": "durable todo/checklist memory for recovery after session compression, context loss, and agent handoff; do not make it the default Telegram or background memory owner",
+      "server": "http://127.0.0.1:3100",
+      "api": "http://127.0.0.1:3100/api",
+      "instancePath": "/Users/ki_mini/.paperclip/instances/default",
+      "company": {
+        "name": "Local Agent Ops",
+        "id": "b51228f9-7908-46e1-8b6f-c0141df69c36",
+        "issuePrefix": "LOC",
+        "cliContext": "local-agent-ops",
+        "checklists": [
+          "LOC-1 Ouroboros evaluation checklist",
+          "LOC-2 Memory policy checklist",
+          "LOC-3 Agent stack recovery checklist",
+          "LOC-4 Paperclip orchestration checklist"
+        ]
+      },
+      "adapters": [
+        "hermes_local",
+        "openclaw_gateway"
+      ],
+      "optimized": {
+        "backupIntervalMinutes": 1440,
+        "backupRetentionDays": 14,
+        "telemetryEnabled": false
+      }
+    },
+    "ouroboros": {
+      "status": "installed-hermes-only",
+      "source": "/Users/ki_mini/Projects/tool/ouroboros-q00",
+      "install": "editable ouroboros-ai[mcp,litellm]",
+      "command": "ouroboros",
+      "hermesSkills": "/Users/ki_mini/.hermes/skills/autonomous-ai-agents/ouroboros",
+      "config": "/Users/ki_mini/.ouroboros/config.yaml",
+      "runtimeBackend": "hermes",
+      "llmBackend": "litellm",
+      "llmEndpoint": "http://127.0.0.1:11434/v1",
+      "defaultModel": "deepseek-v4-flash:cloud",
+      "defaultPolicy": "explicit-only spec-first workflow and repeated-mistake prevention; do not register in Codex by default",
+      "optimized": {
+        "defaultMaxTurns": 4,
+        "maxIterationsPerAcceptanceCriterion": 6,
+        "generationIdleTimeoutSeconds": 1800,
+        "generationNoProgressTimeoutSeconds": 3600,
+        "stage3Consensus": false,
+        "maxParallelWorkers": 1
+      }
+    }
+  },
+  "permissions": {
+    "openclawTools": "owner-local-full",
+    "telegramGroups": "allowlisted",
+    "groupMentionRequired": true
+  },
+  "archive": {
+    "path": "/Users/ki_mini/.openclaw/archive/2026-05-05-hermes-openclaw-reset",
+    "disabledByDefault": [
+      "bridge",
+      "red-book",
+      "mithril",
+      "palantir",
+      "white-room",
+      "mempalace-bridge"
+    ]
+  }
+}
