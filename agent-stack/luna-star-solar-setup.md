@@ -29,27 +29,42 @@ Updated: 2026-05-08
 - `channels.telegram.accounts.star` as an env-backed Star Telegram account.
 - `channels.telegram.accounts.solar` as an env-backed Solar Telegram account.
 
-The Star and Solar Telegram accounts are intentionally `enabled: false` until
-real bot tokens are supplied. This prevents failed startup loops or accidental
+Current token state:
+
+- Luna uses `/Users/ki_mini/.openclaw/secrets/telegram/luna.token` and is
+  enabled.
+- Solar uses `/Users/ki_mini/.openclaw/secrets/telegram/solar.token` and is
+  enabled.
+- Star is configured to use
+  `/Users/ki_mini/.openclaw/secrets/telegram/star.token`, but remains disabled
+  until that token file exists.
+
+Star staying disabled prevents failed startup loops or accidental
 placeholder-token polling.
+
+All three agents have RTK-first context limits: small startup context, bounded
+memory reads, bounded tool results, and short Paperclip/Hermes handoff summaries
+before Codex/Claude/Gemini escalation.
 
 ## Token Setup
 
-Create two Telegram bots with BotFather and store the tokens locally:
+Create missing Telegram bots with BotFather and store the tokens locally.
+Preferred token-file setup:
 
 ```bash
-export OPENCLAW_TELEGRAM_STAR_BOT_TOKEN="..."
-export OPENCLAW_TELEGRAM_SOLAR_BOT_TOKEN="..."
+mkdir -p /Users/ki_mini/.openclaw/secrets/telegram
+printf '%s\n' 'PASTE_STAR_TOKEN_HERE' > /Users/ki_mini/.openclaw/secrets/telegram/star.token
+chmod 600 /Users/ki_mini/.openclaw/secrets/telegram/star.token
 ```
 
-For launchd/OpenClaw app usage, put those environment variables in the service
-environment or another local secret provider. Do not commit token values.
+Environment variables are also acceptable for discovery, but OpenClaw runtime
+uses token files so tokens do not live inside `openclaw.json`. Do not commit
+token values.
 
-After tokens are available, enable the accounts:
+After the Star token is available, enable the account:
 
 ```bash
 openclaw config set channels.telegram.accounts.star.enabled true --strict-json
-openclaw config set channels.telegram.accounts.solar.enabled true --strict-json
 openclaw config validate
 openclaw gateway restart
 ```
@@ -59,14 +74,7 @@ If `config set` cannot set nested booleans cleanly on this OpenClaw build, edit
 
 ```json
 {
-  "channels": {
-    "telegram": {
-      "accounts": {
-        "star": { "enabled": true },
-        "solar": { "enabled": true }
-      }
-    }
-  }
+  "channels": { "telegram": { "accounts": { "star": { "enabled": true } } } }
 }
 ```
 
@@ -115,15 +123,16 @@ openclaw agents list --bindings --json
 openclaw channels status --probe
 ```
 
-Expected before Star/Solar tokens are added:
+Expected while Star token is still missing:
 
 - Config is valid.
 - Luna, Star, and Solar agents exist.
 - Star and Solar identity names display separately.
-- Star/Solar Telegram accounts exist but are disabled.
+- Luna and Solar Telegram accounts are enabled.
+- Star Telegram account exists but is disabled.
 
-Expected after tokens are added and accounts are enabled:
+Expected after Star token is added and Star is enabled:
 
-- Telegram channel status shows the Star and Solar accounts as configured.
+- Telegram channel status shows Luna, Solar, and Star accounts as configured.
 - Direct messages to Star route to Codex.
 - Direct messages to Solar route to Claude.
