@@ -10,7 +10,29 @@
           "claude-cli/claude-sonnet-4-6",
           "openai-codex/gpt-5.5"
         ]
-      }
+      },
+      "skills": [
+        "ohmyclaw",
+        "model-usage",
+        "rtk-optimizer",
+        "web-search",
+        "file-manager",
+        "self-improving"
+      ],
+      "contextLimits": {
+        "memoryGetMaxChars": 2200,
+        "memoryGetDefaultLines": 60,
+        "toolResultMaxChars": 5000,
+        "postCompactionMaxChars": 2200
+      },
+      "startupContext": {
+        "enabled": false,
+        "maxTotalChars": 1500,
+        "maxFileChars": 600,
+        "dailyMemoryDays": 1
+      },
+      "bootstrapMaxChars": 1500,
+      "bootstrapTotalMaxChars": 2200
     },
     "list": [
       {
@@ -20,6 +42,15 @@
         "agentRuntime": {
           "id": "auto",
           "fallback": "pi"
+        },
+        "contextLimits": {
+          "memoryGetMaxChars": 1800,
+          "memoryGetDefaultLines": 45,
+          "toolResultMaxChars": 4500,
+          "postCompactionMaxChars": 1800
+        },
+        "skillsLimits": {
+          "maxSkillsPromptChars": 1800
         }
       },
       {
@@ -35,6 +66,15 @@
         "identity": {
           "name": "Star",
           "emoji": "*"
+        },
+        "contextLimits": {
+          "memoryGetMaxChars": 1800,
+          "memoryGetDefaultLines": 45,
+          "toolResultMaxChars": 4500,
+          "postCompactionMaxChars": 1800
+        },
+        "skillsLimits": {
+          "maxSkillsPromptChars": 1400
         }
       },
       {
@@ -50,6 +90,15 @@
         "identity": {
           "name": "Solar",
           "emoji": "sun"
+        },
+        "contextLimits": {
+          "memoryGetMaxChars": 1800,
+          "memoryGetDefaultLines": 45,
+          "toolResultMaxChars": 4500,
+          "postCompactionMaxChars": 1800
+        },
+        "skillsLimits": {
+          "maxSkillsPromptChars": 1400
         }
       }
     ]
@@ -61,26 +110,23 @@
         "star": {
           "name": "Star Codex Bot",
           "enabled": false,
-          "botToken": {
-            "source": "env",
-            "provider": "default",
-            "id": "OPENCLAW_TELEGRAM_STAR_BOT_TOKEN"
-          },
+          "tokenFile": "/Users/ki_mini/.openclaw/secrets/telegram/star.token",
           "dmPolicy": "pairing",
           "groupPolicy": "allowlist",
           "responsePrefix": "Star"
         },
         "solar": {
           "name": "Solar Claude Bot",
-          "enabled": false,
-          "botToken": {
-            "source": "env",
-            "provider": "default",
-            "id": "OPENCLAW_TELEGRAM_SOLAR_BOT_TOKEN"
-          },
+          "enabled": true,
+          "tokenFile": "/Users/ki_mini/.openclaw/secrets/telegram/solar.token",
           "dmPolicy": "pairing",
           "groupPolicy": "allowlist",
           "responsePrefix": "Solar"
+        },
+        "default": {
+          "name": "Luna Bot",
+          "enabled": true,
+          "tokenFile": "/Users/ki_mini/.openclaw/secrets/telegram/luna.token"
         }
       }
     }
