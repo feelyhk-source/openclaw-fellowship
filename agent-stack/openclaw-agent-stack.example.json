@@ -1,0 +1,88 @@
+{
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "ollama/qwen3.5:cloud",
+        "fallbacks": [
+          "ollama/deepseek-v4-flash:cloud",
+          "ollama/kimi-k2.6:cloud",
+          "ollama/glm-5.1:cloud",
+          "claude-cli/claude-sonnet-4-6",
+          "openai-codex/gpt-5.5"
+        ]
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "name": "Luna",
+        "model": "ollama/qwen3.5:cloud",
+        "agentRuntime": {
+          "id": "auto",
+          "fallback": "pi"
+        }
+      },
+      {
+        "id": "star",
+        "name": "Star",
+        "workspace": "/Users/ki_mini/.openclaw/workspaces/star",
+        "model": "openai-codex/gpt-5.5",
+        "agentRuntime": {
+          "id": "codex",
+          "fallback": "none"
+        },
+        "thinkingDefault": "high",
+        "identity": {
+          "name": "Star",
+          "emoji": "*"
+        }
+      },
+      {
+        "id": "solar",
+        "name": "Solar",
+        "workspace": "/Users/ki_mini/.openclaw/workspaces/solar",
+        "model": "anthropic/claude-sonnet-4-6",
+        "agentRuntime": {
+          "id": "claude-cli",
+          "fallback": "none"
+        },
+        "thinkingDefault": "high",
+        "identity": {
+          "name": "Solar",
+          "emoji": "sun"
+        }
+      }
+    ]
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "accounts": {
+        "star": {
+          "name": "Star Codex Bot",
+          "enabled": false,
+          "botToken": {
+            "source": "env",
+            "provider": "default",
+            "id": "OPENCLAW_TELEGRAM_STAR_BOT_TOKEN"
+          },
+          "dmPolicy": "pairing",
+          "groupPolicy": "allowlist",
+          "responsePrefix": "Star"
+        },
+        "solar": {
+          "name": "Solar Claude Bot",
+          "enabled": false,
+          "botToken": {
+            "source": "env",
+            "provider": "default",
+            "id": "OPENCLAW_TELEGRAM_SOLAR_BOT_TOKEN"
+          },
+          "dmPolicy": "pairing",
+          "groupPolicy": "allowlist",
+          "responsePrefix": "Solar"
+        }
+      }
+    }
+  }
+}
