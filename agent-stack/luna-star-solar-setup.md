@@ -28,6 +28,10 @@ Updated: 2026-05-08
   identity.
 - `channels.telegram.accounts.star` as an env-backed Star Telegram account.
 - `channels.telegram.accounts.solar` as an env-backed Solar Telegram account.
+- `agents.list[].id=shorts` as ShortsMaker for Paw Studio short-form launch
+  assets.
+- `agents.list[].id=sns` as SNSManager for Paw Studio publishing/calendar
+  operations.
 
 Current token state:
 
@@ -35,12 +39,9 @@ Current token state:
   enabled.
 - Solar uses `/Users/ki_mini/.openclaw/secrets/telegram/solar.token` and is
   enabled.
-- Star is configured to use
-  `/Users/ki_mini/.openclaw/secrets/telegram/star.token`, but remains disabled
-  until that token file exists.
-
-Star staying disabled prevents failed startup loops or accidental
-placeholder-token polling.
+- Star uses `/Users/ki_mini/.openclaw/secrets/telegram/star.token` and is
+  enabled. The token was recovered from the archived 2026-05-05 Star bridge
+  env and verified as `@Codex_star_bot` before being moved to the token file.
 
 All three agents have RTK-first context limits: small startup context, bounded
 memory reads, bounded tool results, and short Paperclip/Hermes handoff summaries
@@ -61,7 +62,8 @@ Environment variables are also acceptable for discovery, but OpenClaw runtime
 uses token files so tokens do not live inside `openclaw.json`. Do not commit
 token values.
 
-After the Star token is available, enable the account:
+If Star is ever reset or disabled, verify the token file and re-enable the
+account:
 
 ```bash
 openclaw config set channels.telegram.accounts.star.enabled true --strict-json
@@ -123,16 +125,26 @@ openclaw agents list --bindings --json
 openclaw channels status --probe
 ```
 
-Expected while Star token is still missing:
-
-- Config is valid.
-- Luna, Star, and Solar agents exist.
-- Star and Solar identity names display separately.
-- Luna and Solar Telegram accounts are enabled.
-- Star Telegram account exists but is disabled.
-
 Expected after Star token is added and Star is enabled:
 
 - Telegram channel status shows Luna, Solar, and Star accounts as configured.
 - Direct messages to Star route to Codex.
 - Direct messages to Solar route to Claude.
+
+## Paw Studio Growth Agents
+
+ShortsMaker and SNSManager are local OpenClaw agents, not separate Telegram bots
+yet. They should be invoked through Luna/Hermes until separate bot tokens are
+created.
+
+- ShortsMaker: makes Paw Studio ad shorts scripts, shot lists, media prompts,
+  edit checklists, and campaign variants. Uses Ollama Cloud by default and
+  escalates to Star for automation code, Solar for strategy/risk review, and
+  Gemini/image-video tools only when media generation is needed.
+- SNSManager: manages platform calendar, upload checklists, captions, hashtags,
+  and analytics summaries. Uses Ollama Cloud by default and requires explicit
+  human approval before public posting, deleting, DMs, or ad spend.
+- Paperclip remains the durable checklist store for campaign direction and
+  context-loss recovery.
+- Ouroboros is the explicit self-check loop before repeated campaign templates
+  or automation rules are treated as stable.
