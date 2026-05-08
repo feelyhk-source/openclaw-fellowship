@@ -1,5 +1,5 @@
 {
-  "version": "2026-05-08-local-paperclip-honcho-self-host-ouroboros-optimized",
+  "version": "2026-05-08-star-shorts-sns-growth-agents",
   "runtime": {
     "mode": "local",
     "vps": false,
@@ -112,6 +112,37 @@
         "stage3Consensus": false,
         "maxParallelWorkers": 1
       }
+    },
+    "growthAgents": {
+      "purpose": "Paw Studio Apps in Toss launch advertising and SNS operations",
+      "shorts": {
+        "agentId": "shorts",
+        "name": "ShortsMaker",
+        "model": "ollama/qwen3.5:cloud",
+        "workspace": "/Users/ki_mini/.openclaw/workspaces/shorts",
+        "role": "short-form ad scripts, shot lists, media prompt packs, edit checklists, creative variants",
+        "escalation": {
+          "star": "automation code, repo work, upload tooling",
+          "solar": "launch strategy, policy risk, reputation risk",
+          "gemini": "image/video generation or multimodal inspection when explicitly needed"
+        }
+      },
+      "sns": {
+        "agentId": "sns",
+        "name": "SNSManager",
+        "model": "ollama/qwen3.5:cloud",
+        "workspace": "/Users/ki_mini/.openclaw/workspaces/sns",
+        "role": "platform calendar, captions, hashtag packs, upload checklists, analytics summaries",
+        "approvalRequiredBefore": [
+          "public posting",
+          "deleting public content",
+          "customer DM/comment actions",
+          "ad spend",
+          "connecting new SNS credentials"
+        ]
+      },
+      "paperclipChecklist": "/Users/ki_mini/.openclaw/workspace/paperclip/checklists/pawstudio-growth.md",
+      "ouroborosPolicy": "explicit-only self-check before repeatable campaign templates or automation rules are treated as stable"
     }
   },
   "permissions": {
