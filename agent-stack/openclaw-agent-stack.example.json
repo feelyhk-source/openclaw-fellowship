@@ -100,6 +100,52 @@
         "skillsLimits": {
           "maxSkillsPromptChars": 1400
         }
+      },
+      {
+        "id": "shorts",
+        "name": "ShortsMaker",
+        "workspace": "/Users/ki_mini/.openclaw/workspaces/shorts",
+        "model": "ollama/qwen3.5:cloud",
+        "agentRuntime": {
+          "id": "auto",
+          "fallback": "pi"
+        },
+        "identity": {
+          "name": "ShortsMaker",
+          "emoji": "video"
+        },
+        "contextLimits": {
+          "memoryGetMaxChars": 1600,
+          "memoryGetDefaultLines": 40,
+          "toolResultMaxChars": 4000,
+          "postCompactionMaxChars": 1600
+        },
+        "skillsLimits": {
+          "maxSkillsPromptChars": 1200
+        }
+      },
+      {
+        "id": "sns",
+        "name": "SNSManager",
+        "workspace": "/Users/ki_mini/.openclaw/workspaces/sns",
+        "model": "ollama/qwen3.5:cloud",
+        "agentRuntime": {
+          "id": "auto",
+          "fallback": "pi"
+        },
+        "identity": {
+          "name": "SNSManager",
+          "emoji": "share"
+        },
+        "contextLimits": {
+          "memoryGetMaxChars": 1600,
+          "memoryGetDefaultLines": 40,
+          "toolResultMaxChars": 4000,
+          "postCompactionMaxChars": 1600
+        },
+        "skillsLimits": {
+          "maxSkillsPromptChars": 1200
+        }
       }
     ]
   },
@@ -109,7 +155,7 @@
       "accounts": {
         "star": {
           "name": "Star Codex Bot",
-          "enabled": false,
+          "enabled": true,
           "tokenFile": "/Users/ki_mini/.openclaw/secrets/telegram/star.token",
           "dmPolicy": "pairing",
           "groupPolicy": "allowlist",
