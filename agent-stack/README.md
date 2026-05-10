@@ -9,4 +9,5 @@ No bot tokens, API keys, OAuth tokens, or local auth-state files belong here.
 
 - `luna-star-solar-setup.md`: operational setup and routing policy.
 - `openclaw-agent-stack.example.json`: sanitized OpenClaw config excerpt.
+- `route-smoke-2026-05-10.md`: latest routing and health smoke-test evidence.
 - `tokenless-github-policy.md`: what is safe to commit and what must stay local.

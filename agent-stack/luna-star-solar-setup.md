@@ -1,6 +1,6 @@
 # Luna, Star, Solar Setup
 
-Updated: 2026-05-08
+Updated: 2026-05-10
 
 ## Roles
 
@@ -26,8 +26,8 @@ Updated: 2026-05-08
 - Solar workspace is `/Users/ki_mini/.openclaw/workspaces/solar` so its
   `IDENTITY.md` displays as Solar instead of inheriting Luna's workspace
   identity.
-- `channels.telegram.accounts.star` as an env-backed Star Telegram account.
-- `channels.telegram.accounts.solar` as an env-backed Solar Telegram account.
+- `channels.telegram.accounts.star` as a token-file-backed Star Telegram account.
+- `channels.telegram.accounts.solar` as a token-file-backed Solar Telegram account.
 - `agents.list[].id=shorts` as ShortsMaker for Paw Studio short-form launch
   assets.
 - `agents.list[].id=sns` as SNSManager for Paw Studio publishing/calendar
@@ -38,14 +38,30 @@ Current token state:
 - Luna uses `/Users/ki_mini/.openclaw/secrets/telegram/luna.token` and is
   enabled.
 - Solar uses `/Users/ki_mini/.openclaw/secrets/telegram/solar.token` and is
-  enabled.
+  enabled. Claude auth is verified through `luna-pet.mjs`; if Claude CLI ever
+  returns login/quota failures, keep the Solar agent definition but temporarily
+  disable the Telegram account until auth is healthy again.
 - Star uses `/Users/ki_mini/.openclaw/secrets/telegram/star.token` and is
   enabled. The token was recovered from the archived 2026-05-05 Star bridge
   env and verified as `@Codex_star_bot` before being moved to the token file.
 
-All three agents have RTK-first context limits: small startup context, bounded
-memory reads, bounded tool results, and short Paperclip/Hermes handoff summaries
-before Codex/Claude/Gemini escalation.
+All agents have RTK-first context limits: startup context is off, bootstrap is
+bounded to `bootstrapMaxChars=2500` and `bootstrapTotalMaxChars=7000`, routine
+Ollama agents cap runtime context at `65536`, Star caps at `65536`, and Solar
+caps at `32768`. Star defaults to low thinking so short direct messages do not
+pay the full high-reasoning cost; ask Star explicitly for higher reasoning on
+difficult coding tasks. Solar defaults to minimal thinking and should be raised
+only for deeper reviews.
+
+Default Ollama fallback order is `qwen3.5:cloud` primary, then
+`glm-5.1:cloud`, `kimi-k2.6:cloud`, `deepseek-v4-pro:cloud`, and
+`minimax-m2.7:cloud`. `qwen3-coder-next:cloud` may stay available as a named
+model, but it must not be Luna's ordinary conversation model.
+
+Star has a narrow OpenClaw tool allowlist so Codex is reserved for coding work
+and does not see every possible OpenClaw tool by default. Even with that
+allowlist, Codex ACP calls can still inject a large tool catalog, so Star should
+be treated as a high-value coding expert, not a routine chat bot.
 
 ## Token Setup
 
@@ -125,11 +141,29 @@ openclaw agents list --bindings --json
 openclaw channels status --probe
 ```
 
-Expected after Star token is added and Star is enabled:
+Expected after Star and Solar token files are present and enabled:
 
-- Telegram channel status shows Luna, Solar, and Star accounts as configured.
+- Telegram channel status shows Luna, Star, and Solar running and connected.
 - Direct messages to Star route to Codex.
-- Direct messages to Solar route to Claude.
+- Direct messages to Solar route to Claude only when Claude auth is healthy.
+- Luna routes coding tasks to Star/Codex, review/risk/policy tasks to
+  Solar/Claude, and routine chat to Luna/Ollama.
+
+Routing smoke:
+
+```bash
+node /Users/ki_mini/.openclaw/workspace/scripts/ascension-brain.mjs \
+  "React 빌드 에러 원인 찾아서 코드 수정하고 테스트까지 돌려줘"
+
+node /Users/ki_mini/.openclaw/workspace/scripts/ascension-brain.mjs \
+  "출시 전 개인정보 처리방침과 정책 리스크를 검토해줘"
+```
+
+Expected:
+
+- The coding prompt includes `star/codex` in `route.escalation`.
+- The policy/risk prompt includes `solar/claude` in `route.escalation` and
+  enables bounded Ouroboros self-check.
 
 ## Paw Studio Growth Agents
 

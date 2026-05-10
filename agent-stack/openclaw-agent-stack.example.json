@@ -4,35 +4,37 @@
       "model": {
         "primary": "ollama/qwen3.5:cloud",
         "fallbacks": [
-          "ollama/deepseek-v4-flash:cloud",
-          "ollama/kimi-k2.6:cloud",
           "ollama/glm-5.1:cloud",
+          "ollama/kimi-k2.6:cloud",
+          "ollama/deepseek-v4-pro:cloud",
+          "ollama/minimax-m2.7:cloud",
           "claude-cli/claude-sonnet-4-6",
           "openai-codex/gpt-5.5"
         ]
       },
-      "skills": [
-        "ohmyclaw",
-        "model-usage",
-        "rtk-optimizer",
-        "web-search",
-        "file-manager",
-        "self-improving"
-      ],
-      "contextLimits": {
-        "memoryGetMaxChars": 2200,
-        "memoryGetDefaultLines": 60,
-        "toolResultMaxChars": 5000,
-        "postCompactionMaxChars": 2200
+      "imageModel": {
+        "primary": "google/gemini-3.1-flash-lite-preview"
       },
       "startupContext": {
         "enabled": false,
-        "maxTotalChars": 1500,
-        "maxFileChars": 600,
+        "maxTotalChars": 1000,
+        "maxFileChars": 400,
         "dailyMemoryDays": 1
       },
-      "bootstrapMaxChars": 1500,
-      "bootstrapTotalMaxChars": 2200
+      "bootstrapMaxChars": 2500,
+      "bootstrapTotalMaxChars": 7000,
+      "contextLimits": {
+        "memoryGetMaxChars": 1800,
+        "memoryGetDefaultLines": 40,
+        "toolResultMaxChars": 3500,
+        "postCompactionMaxChars": 1800
+      },
+      "skills": [],
+      "skillsLimits": {
+        "maxSkillsPromptChars": 0
+      },
+      "contextTokens": 65536,
+      "contextInjection": "continuation-skip"
     },
     "list": [
       {
@@ -43,15 +45,8 @@
           "id": "auto",
           "fallback": "pi"
         },
-        "contextLimits": {
-          "memoryGetMaxChars": 1800,
-          "memoryGetDefaultLines": 45,
-          "toolResultMaxChars": 4500,
-          "postCompactionMaxChars": 1800
-        },
-        "skillsLimits": {
-          "maxSkillsPromptChars": 1800
-        }
+        "thinkingDefault": "off",
+        "workspace": "/Users/ki_mini/.openclaw/workspace"
       },
       {
         "id": "star",
@@ -62,19 +57,35 @@
           "id": "codex",
           "fallback": "none"
         },
-        "thinkingDefault": "high",
+        "thinkingDefault": "low",
         "identity": {
           "name": "Star",
           "emoji": "*"
         },
         "contextLimits": {
-          "memoryGetMaxChars": 1800,
-          "memoryGetDefaultLines": 45,
-          "toolResultMaxChars": 4500,
-          "postCompactionMaxChars": 1800
+          "memoryGetMaxChars": 900,
+          "memoryGetDefaultLines": 20,
+          "toolResultMaxChars": 3000,
+          "postCompactionMaxChars": 900
         },
         "skillsLimits": {
-          "maxSkillsPromptChars": 1400
+          "maxSkillsPromptChars": 0
+        },
+        "contextTokens": 65536,
+        "tools": {
+          "allow": [
+            "read",
+            "edit",
+            "write",
+            "apply_patch",
+            "exec",
+            "process",
+            "session_status",
+            "sessions_list",
+            "sessions_history",
+            "sessions_send",
+            "sessions_spawn"
+          ]
         }
       },
       {
@@ -86,20 +97,21 @@
           "id": "claude-cli",
           "fallback": "none"
         },
-        "thinkingDefault": "high",
+        "thinkingDefault": "minimal",
         "identity": {
           "name": "Solar",
           "emoji": "sun"
         },
         "contextLimits": {
-          "memoryGetMaxChars": 1800,
-          "memoryGetDefaultLines": 45,
-          "toolResultMaxChars": 4500,
-          "postCompactionMaxChars": 1800
+          "memoryGetMaxChars": 900,
+          "memoryGetDefaultLines": 20,
+          "toolResultMaxChars": 3000,
+          "postCompactionMaxChars": 900
         },
         "skillsLimits": {
-          "maxSkillsPromptChars": 1400
-        }
+          "maxSkillsPromptChars": 0
+        },
+        "contextTokens": 32768
       },
       {
         "id": "shorts",
@@ -113,15 +125,6 @@
         "identity": {
           "name": "ShortsMaker",
           "emoji": "video"
-        },
-        "contextLimits": {
-          "memoryGetMaxChars": 1600,
-          "memoryGetDefaultLines": 40,
-          "toolResultMaxChars": 4000,
-          "postCompactionMaxChars": 1600
-        },
-        "skillsLimits": {
-          "maxSkillsPromptChars": 1200
         }
       },
       {
@@ -136,15 +139,6 @@
         "identity": {
           "name": "SNSManager",
           "emoji": "share"
-        },
-        "contextLimits": {
-          "memoryGetMaxChars": 1600,
-          "memoryGetDefaultLines": 40,
-          "toolResultMaxChars": 4000,
-          "postCompactionMaxChars": 1600
-        },
-        "skillsLimits": {
-          "maxSkillsPromptChars": 1200
         }
       }
     ]
@@ -153,11 +147,16 @@
     "telegram": {
       "enabled": true,
       "accounts": {
+        "default": {
+          "name": "Luna Bot",
+          "enabled": true,
+          "tokenFile": "/Users/ki_mini/.openclaw/secrets/telegram/luna.token"
+        },
         "star": {
           "name": "Star Codex Bot",
           "enabled": true,
           "tokenFile": "/Users/ki_mini/.openclaw/secrets/telegram/star.token",
-          "dmPolicy": "pairing",
+          "dmPolicy": "allowlist",
           "groupPolicy": "allowlist",
           "responsePrefix": "Star"
         },
@@ -165,16 +164,28 @@
           "name": "Solar Claude Bot",
           "enabled": true,
           "tokenFile": "/Users/ki_mini/.openclaw/secrets/telegram/solar.token",
-          "dmPolicy": "pairing",
+          "dmPolicy": "allowlist",
           "groupPolicy": "allowlist",
           "responsePrefix": "Solar"
-        },
-        "default": {
-          "name": "Luna Bot",
-          "enabled": true,
-          "tokenFile": "/Users/ki_mini/.openclaw/secrets/telegram/luna.token"
         }
       }
     }
-  }
+  },
+  "bindings": [
+    {
+      "agentId": "main",
+      "channel": "telegram",
+      "accountId": "default"
+    },
+    {
+      "agentId": "star",
+      "channel": "telegram",
+      "accountId": "star"
+    },
+    {
+      "agentId": "solar",
+      "channel": "telegram",
+      "accountId": "solar"
+    }
+  ]
 }

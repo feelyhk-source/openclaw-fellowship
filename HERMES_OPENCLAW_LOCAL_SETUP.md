@@ -1,6 +1,6 @@
 # Local Hermes + OpenClaw Setup
 
-Updated: 2026-05-08
+Updated: 2026-05-09
 
 ## Goal
 
@@ -15,18 +15,35 @@ Run the agent stack locally without a VPS.
 
 1. Telegram messages enter through OpenClaw native Telegram.
 2. OpenClaw uses Ollama Cloud by default.
-3. Hermes is the memory/planning brain and uses Honcho for durable recall.
-4. Hermes directs OpenClaw when work needs Telegram, local execution, browser, filesystem, or device control.
-5. Paperclip holds durable todo/checklist memory for recovery after context loss, session rollover, or compression.
-6. Ouroboros is used explicitly for spec-first planning, self-checking, and repeated-mistake prevention.
-7. Claude/Codex/Gemini are used only when routine Ollama Cloud models are not enough or the user explicitly asks for escalation.
+3. Luna applies the lightweight Ascension Brain router before nontrivial work: `/Users/ki_mini/.openclaw/workspace/scripts/ascension-brain.mjs`.
+4. Hermes is the memory/planning brain and uses Honcho for durable recall; OpenClaw calls Hermes locally with `scripts/hermes-local.sh ask` when planning, durable memory, or decomposition is needed.
+5. OpenClaw remains the Telegram/local execution layer when work needs Telegram, local execution, browser, filesystem, or device control.
+6. Paperclip holds durable todo/checklist memory for recovery after context loss, session rollover, or compression.
+7. Ouroboros is used explicitly for spec-first planning, self-checking, and repeated-mistake prevention.
+8. Claude/Codex/Gemini are used only when routine Ollama Cloud models are not enough or the user explicitly asks for escalation.
+
+## Agent Triad
+
+- Luna (`@Feelyhk_bot`): primary fast coordinator and everyday assistant. Default model is `ollama/qwen3.5:cloud`; it should keep routine chat, Telegram coordination, memory-aware routing, `/goal`, and `/pet` light and responsive.
+- Star (`@Codex_star_bot`): Codex coding specialist. It uses `openai-codex/gpt-5.5`, low thinking by default, compact bootstrap files, and should receive narrow RTK-style briefs for repo edits, tests, builds, debugging, and PR prep.
+- Solar (`@claude_solar_bot`): Claude reasoning specialist. It is configured for `claude-cli/claude-sonnet-4-6`, low thinking by default, compact bootstrap files, and should handle architecture, review, policy/risk, and strategy. If Claude CLI is not logged in, Solar may fall back to Ollama Cloud and must disclose that degraded mode instead of claiming Claude ran.
+
+All three Telegram accounts should be enabled and connected. Verify with:
+
+`openclaw channels status --probe`
+
+Deep smoke check:
+
+`node /Users/ki_mini/.openclaw/workspace/scripts/luna-pet.mjs`
 
 ## Hermes Runtime
 
 - Official Hermes is installed at `/Users/ki_mini/.hermes/hermes-agent`.
 - CLI shim: `/Users/ki_mini/.local/bin/hermes`.
-- Active model route: Hermes uses local Ollama's OpenAI-compatible endpoint at `http://127.0.0.1:11434/v1`.
-- Active default model: `deepseek-v4-flash:cloud`.
+- Active model route: Hermes uses local Ollama's OpenAI-compatible endpoint at `http://127.0.0.1:11434/v1`, with `qwen3.5:cloud` as the default fast planning/memory model. Escalate to `deepseek-v4-pro:cloud`, Claude, or Codex only for harder reasoning/coding.
+- Active Luna/OpenClaw default model: `qwen3.5:cloud`.
+- Routine fallbacks: `glm-5.1:cloud`, `kimi-k2.6:cloud`, `deepseek-v4-pro:cloud`, `minimax-m2.7:cloud`.
+- Coding-specialized model: `qwen3-coder-next:cloud`; do not keep it in Luna's ordinary conversation fallback path.
 - OpenClaw helper: `/Users/ki_mini/.openclaw/workspace/scripts/hermes-local.sh`.
 
 ## Honcho Memory
@@ -39,7 +56,7 @@ Run the agent stack locally without a VPS.
 - PostgreSQL runs through Homebrew `postgresql@17`; database `honcho` has pgvector enabled.
 - Embeddings use local Ollama `granite-embedding` through the OpenAI-compatible padding proxy at `http://127.0.0.1:11435/v1`.
 - Embedding proxy launchd service: `/Users/ki_mini/Library/LaunchAgents/com.local.honcho-embed-proxy.plist` (`com.local.honcho-embed-proxy`).
-- Honcho deriver, summary, and dialectic LLM calls use local Ollama OpenAI-compatible endpoint `http://127.0.0.1:11434/v1` with `qwen3.5:cloud`.
+- Honcho deriver, summary, and dialectic LLM calls use local Ollama OpenAI-compatible endpoint `http://127.0.0.1:11434/v1`; prefer `qwen3.5:cloud` for fast bounded summaries and `deepseek-v4-pro:cloud` for harder reasoning.
 - `DREAM_ENABLED=false` to avoid surprise periodic token spend.
 - Hermes memory provider is `honcho`; verify with `hermes memory status`.
 - Low-token Honcho policy is stored at `/Users/ki_mini/.hermes/honcho.json`: tools-mode recall, bounded context, shallow dialectic depth, slower recall cadence, and session-level writes.
@@ -51,13 +68,16 @@ Run the agent stack locally without a VPS.
 
 - Memory: Honcho is the current preferred memory backend for Hermes.
 - Token saving: RTK-style compression remains active through `rtk-optimizer` and small bootstrap context.
+- Ascension Brain: `/Users/ki_mini/.openclaw/workspace/scripts/ascension-brain.mjs` classifies nontrivial work into Luna, Hermes/Honcho, Paperclip, Ouroboros, Star/Codex, Solar/Claude, and Gemini routes. Default mode is dry-run JSON; use `--execute-hermes` only when an actual Hermes consultation should run.
+- Goal loop: `/Users/ki_mini/.openclaw/workspace/scripts/luna-goal.mjs` implements `/goal`-style bounded continuation until the result is reached or the turn budget pauses the loop.
+- Pet check: `/Users/ki_mini/.openclaw/workspace/scripts/luna-pet.mjs` implements `/pet`-style smoke testing for OpenClaw, Hermes/Honcho, Paperclip, Ouroboros, Ascension Brain, and the active goal state.
 - Paperclip: local Paperclip is configured under `/Users/ki_mini/.paperclip/instances/default` and runs on `http://127.0.0.1:3100`.
 - Paperclip adapter status: `hermes_local` and `openclaw_gateway` are loaded as Paperclip builtin adapters. The external Hermes adapter source is also cloned and built at `/Users/ki_mini/Projects/tool/hermes-paperclip-adapter`.
 - Paperclip helper: `/Users/ki_mini/.openclaw/workspace/scripts/paperclip-local.sh`.
 - Paperclip launchd service: `/Users/ki_mini/Library/LaunchAgents/com.local.paperclip.plist` (`com.local.paperclip`).
 - Paperclip company `Local Agent Ops` is the durable checklist board for recovery and direction-setting.
 - Current Paperclip checklist issues: `LOC-1` Ouroboros evaluation, `LOC-2` memory policy, `LOC-3` agent stack recovery, `LOC-4` Paperclip orchestration.
-- Paperclip CLI default context points to `Local Agent Ops`, so `paperclipai issue list` works without manually passing a company id.
+- Paperclip CLI default context points to `Local Agent Ops`, so `npx paperclipai issue list` works without manually passing a company id.
 - Paperclip agents are not created by default; create them in the Paperclip UI only when orchestration is needed.
 - Paperclip backups are daily with 14-day retention to avoid noisy hourly background work.
 - Mempalace and mem0 remain optional and are not active in the default runtime.
@@ -70,7 +90,7 @@ Run the agent stack locally without a VPS.
 - Hermes skills are installed under `/Users/ki_mini/.hermes/skills/autonomous-ai-agents/ouroboros/`.
 - Ouroboros MCP is registered in `/Users/ki_mini/.hermes/config.yaml`.
 - Ouroboros config is set to `orchestrator.runtime_backend: hermes` and `llm.backend: litellm`.
-- Ouroboros LiteLLM uses the local Ollama OpenAI-compatible endpoint at `http://127.0.0.1:11434/v1` with `deepseek-v4-flash:cloud` by default.
+- Ouroboros LiteLLM uses the local Ollama OpenAI-compatible endpoint at `http://127.0.0.1:11434/v1`; keep it bounded and prefer stronger planning models for high-stakes checks.
 - Stage 3 consensus is disabled by default and `max_parallel_workers` is `1` to avoid surprise token spend.
 - Use Ouroboros explicitly for larger spec-first workflows, self-checking, or recurring-mistake prevention, for example inside Hermes with `ooo interview "..."` or from terminal with `ouroboros init start --llm-backend litellm "..."`.
 - Ouroboros timeouts and iteration caps are bounded for local use: 4 default turns, 6 iterations per acceptance criterion, 30m idle timeout, 60m no-progress timeout.
@@ -83,7 +103,7 @@ Hermes should hold the working memory, Honcho recall, Paperclip checklist, and O
 
 Escalation should stay explicit and task-shaped:
 
-- Routine work: Ollama Cloud through the local OpenAI-compatible endpoint.
+- Routine work: Ollama Cloud through the local OpenAI-compatible endpoint. Luna currently defaults to `qwen3.5:cloud`; `glm-5.1:cloud`, `kimi-k2.6:cloud`, `deepseek-v4-pro:cloud`, and `minimax-m2.7:cloud` are routine fallbacks.
 - Hard coding/review/deep reasoning: Codex or Claude.
 - Gemini-specific strengths: image/video reasoning, multimodal review, and generation workflows when available.
 - High-cost models should receive a summarized brief from Hermes/Paperclip, not the full memory dump.
@@ -91,7 +111,7 @@ Escalation should stay explicit and task-shaped:
 ## Telegram Policy
 
 - Native OpenClaw Telegram is enabled.
-- Existing bot token is preserved.
+- Luna, Star, and Solar bot tokens are loaded from token files and should not be copied into docs or prompts.
 - Existing group allowlist is preserved.
 - Group messages still require mention by default to avoid noisy replies.
 - Old Solar/Luna/Codex bridge processes are stopped and archived.

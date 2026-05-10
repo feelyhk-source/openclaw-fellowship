@@ -1,27 +1,52 @@
 {
-  "version": "2026-05-08-star-shorts-sns-growth-agents",
+  "version": "2026-05-09-restore-qwen35-claude46",
   "runtime": {
     "mode": "local",
     "vps": false,
-    "primaryAgent": "Hermes",
-    "executionAgent": "OpenClaw",
-    "telegram": "openclaw-native"
+    "primaryAgent": "Luna coordination with Ascension Brain routing; Hermes planning + Honcho memory for nontrivial work",
+    "executionAgent": "OpenClaw execution",
+    "telegram": "openclaw-native",
+    "hermesGateway": "stopped intentionally; OpenClaw owns Telegram, Hermes is called locally for planning/memory through hermes-local.sh ask"
   },
   "models": {
-    "default": "deepseek-v4-flash:cloud",
+    "default": "qwen3.5:cloud",
     "hermesEndpoint": "http://127.0.0.1:11434/v1",
     "routine": [
       "ollama/qwen3.5:cloud",
-      "ollama/deepseek-v4-flash:cloud",
+      "ollama/glm-5.1:cloud",
       "ollama/kimi-k2.6:cloud",
-      "ollama/glm-5.1:cloud"
+      "ollama/deepseek-v4-pro:cloud",
+      "ollama/minimax-m2.7:cloud"
     ],
     "escalation": [
       "claude-cli/claude-sonnet-4-6",
+      "claude-cli/claude-opus-4-6",
       "openai-codex/gpt-5.5",
       "gemini-cli/gemini-auth"
     ],
-    "geminiStatus": "google-antigravity auth profile exists in OpenClaw; Hermes Gemini OAuth not logged in"
+    "geminiStatus": "google-antigravity auth profile exists in OpenClaw; Hermes Gemini OAuth not logged in",
+    "routingNotes": {
+      "lunaDefault": "qwen3.5:cloud for fast smart Telegram chat and coordination; restored because live Telegram usage was good.",
+      "hermesDefault": "qwen3.5:cloud for fast planning and Honcho memory recall; escalate to deepseek-v4-pro, Claude, or Codex for hard reasoning/coding.",
+      "triad": "Luna is the Ollama-first coordinator, Star is the Codex coding specialist, Solar is the Claude reasoning/review specialist.",
+      "solarAuthRule": "Solar must not claim Claude ran unless Claude CLI/auth metadata proves it. If Claude auth is unavailable, disclose degraded fallback mode.",
+      "coderNext": "qwen3-coder-next:cloud is not in Luna general fallbacks; use only for explicit coding-specialized model requests or delegate coding to Star/Codex",
+      "tokenPolicy": "preserve Hermes/Honcho/Paperclip/Ouroboros logic; reduce token waste with short RTK briefs and one lightweight orchestration skill instead of broad skill inventory scans",
+      "ascensionBrain": "Use /Users/ki_mini/.openclaw/workspace/scripts/ascension-brain.mjs to classify nontrivial tasks into Luna, Hermes, Paperclip, Ouroboros, Star/Codex, Solar/Claude, and Gemini routes.",
+      "benchmarkNote": "Local one-off CLI timing is lower priority than live Telegram behavior; keep qwen3.5:cloud as Luna/Hermes default unless real user-facing regression appears.",
+      "solarDefault": "sonnet4.6 for normal Solar expert work; opus4.6 only for very hard reasoning/review when explicitly needed"
+    },
+    "hermesDefault": "qwen3.5:cloud",
+    "highIntelligence": [
+      "claude-cli/claude-sonnet-4-6",
+      "claude-cli/claude-opus-4-6",
+      "openai-codex/gpt-5.5"
+    ],
+    "notes": {
+      "lunaDefault": "qwen3.5:cloud for fast smart Telegram chat and coordination; restored because live Telegram usage was good.",
+      "hermesDefault": "qwen3.5:cloud for fast planning and Honcho memory recall; escalate to deepseek-v4-pro, Claude, or Codex for hard reasoning/coding.",
+      "benchmarkNote": "Local one-off CLI timing is lower priority than live Telegram behavior; keep qwen3.5:cloud as Luna/Hermes default unless real user-facing regression appears."
+    }
   },
   "tools": {
     "memory": {
@@ -61,7 +86,7 @@
     },
     "tokenSaving": {
       "active": "rtk-optimizer",
-      "policy": "small bootstrap context, memory only on demand, summarize before escalation"
+      "policy": "short RTK briefs, one lightweight orchestration skill, bounded bootstrap, Paperclip checklist summaries, no broad history dumps"
     },
     "paperclip": {
       "status": "local-server-active-adapters-loaded",
@@ -102,8 +127,8 @@
       "runtimeBackend": "hermes",
       "llmBackend": "litellm",
       "llmEndpoint": "http://127.0.0.1:11434/v1",
-      "defaultModel": "deepseek-v4-flash:cloud",
-      "defaultPolicy": "explicit-only spec-first workflow and repeated-mistake prevention; do not register in Codex by default",
+      "defaultModel": "deepseek-v4-pro:cloud",
+      "defaultPolicy": "automatic bounded self-check for high-risk, repeat-mistake, release, security, and recurring workflow stabilization; no unbounded background loop",
       "optimized": {
         "defaultMaxTurns": 4,
         "maxIterationsPerAcceptanceCriterion": 6,
@@ -150,6 +175,33 @@
     "telegramGroups": "allowlisted",
     "groupMentionRequired": true
   },
+  "telegramAgents": {
+    "luna": {
+      "bot": "@Feelyhk_bot",
+      "agentId": "main",
+      "role": "fast everyday assistant and router",
+      "model": "ollama/qwen3.5:cloud",
+      "statusCheck": "openclaw channels status --probe"
+    },
+    "star": {
+      "bot": "@Codex_star_bot",
+      "agentId": "star",
+      "role": "Codex coding, repo implementation, tests, builds, PR preparation",
+      "model": "openai-codex/gpt-5.5",
+      "thinkingDefault": "low",
+      "statusCheck": "openclaw channels status --probe"
+    },
+    "solar": {
+      "bot": "@claude_solar_bot",
+      "agentId": "solar",
+      "role": "Claude architecture, review, strategy, policy, risk reasoning",
+      "model": "claude-cli/claude-sonnet-4-6",
+      "thinkingDefault": "low",
+      "degradedMode": "If claude auth status is not logged in, OpenClaw falls back to Ollama Cloud and Solar must say it is not running true Claude.",
+      "statusCheck": "claude auth status --json && openclaw channels status --probe",
+      "opusFallback": "claude-cli/claude-opus-4-6"
+    }
+  },
   "archive": {
     "path": "/Users/ki_mini/.openclaw/archive/2026-05-05-hermes-openclaw-reset",
     "disabledByDefault": [
@@ -160,5 +212,41 @@
       "white-room",
       "mempalace-bridge"
     ]
+  },
+  "ascensionBrain": {
+    "status": "active-lightweight-router",
+    "path": "/Users/ki_mini/.openclaw/workspace/scripts/ascension-brain.mjs",
+    "purpose": "Fast task classifier that preserves Hermes/Honcho/Paperclip/Ouroboros intelligence without re-enabling heavy OpenClaw skill discovery on every Telegram turn.",
+    "defaultMode": "dry-run JSON; execute Hermes only with --execute-hermes or when OpenClaw command tools are explicitly used; Hermes fast path uses minimax-m2.7:cloud",
+    "triggers": {
+      "lunaOnly": "routine chat, short coordination, simple answers",
+      "hermesHoncho": "multi-step work, durable decisions, ambiguity, memory recall, automation design, repeated problems",
+      "paperclip": "todos, checklists, handoffs, campaigns, launch work, context-loss recovery",
+      "ouroboros": "high-stakes automation, release/security/billing/public-posting risk, recurring workflows, repeated mistakes",
+      "starCodex": "repo changes, coding implementation, tests, PR work, difficult debugging",
+      "solarClaude": "architecture, review, policy/legal/risk reasoning, high-level strategy",
+      "gemini": "image, video, photo, multimodal generation or inspection",
+      "goal": "messages starting with /goal run /Users/ki_mini/.openclaw/workspace/scripts/luna-goal.mjs for bounded continue-until-result loops",
+      "pet": "messages starting with /pet run /Users/ki_mini/.openclaw/workspace/scripts/luna-pet.mjs for health/routing smoke checks"
+    },
+    "guardrails": [
+      "Do not claim Hermes/Paperclip/Ouroboros ran unless command output confirms it.",
+      "Do not use qwen3-coder-next for ordinary chat.",
+      "Use short RTK briefs for escalation instead of full session dumps.",
+      "Ask before destructive, billing, public posting, account, or irreversible actions.",
+      "Goal loops have bounded max turns and pause instead of spending indefinitely."
+    ]
+  },
+  "commands": {
+    "goal": {
+      "status": "active-helper",
+      "path": "/Users/ki_mini/.openclaw/workspace/scripts/luna-goal.mjs",
+      "policy": "bounded continue-until-result loop; default max 3 turns; use Paperclip/Hermes/Ouroboros routing for durable work"
+    },
+    "pet": {
+      "status": "active-helper",
+      "path": "/Users/ki_mini/.openclaw/workspace/scripts/luna-pet.mjs",
+      "policy": "lightweight health and routing smoke test for OpenClaw, Hermes/Honcho, Paperclip, Ouroboros, Ascension Brain, and goal state"
+    }
   }
 }
